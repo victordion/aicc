@@ -3,7 +3,7 @@ Date: December 7 2015
 Author: Huanzhu Xu and Jianwei Cui
 Reference paper: Regression and Time Series Model Selection in Small Samples
 """
-
+import matplotlib.pyplot as plt
 import math
 import numpy as np
 from scipy import stats
@@ -115,5 +115,21 @@ if __name__ == "__main__":
     print "AICC selection distribution"
     print aicc_win_times
 
+    n_groups = len(aicc_win_times)
+    
+    fig, ax = plt.subplots()
+    index = np.arange(n_groups) 
+    bar_width = 0.35
+    
+    rects1 = plt.bar(index, aic_win_times, bar_width, color='b', label="AIC")
+    rects2 = plt.bar(index + bar_width, aicc_win_times, bar_width, color='r', label="AICC")
+
+    plt.xlabel("Model Order")
+    plt.ylabel("Selected Times")
+    plt.title("Model Criterion Performance")
+    plt.xticks(index + bar_width, index)
+    plt.legend()
+
+    plt.show()
 
 
