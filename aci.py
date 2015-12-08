@@ -34,7 +34,6 @@ Input:
 Output:
     y: a row vector of size N
     x: data point matrix, with out_dim rows and N columns
-
 """
 def genData(sigma, params, out_dim, N):
     x = np.ones((out_dim, N))
@@ -76,13 +75,11 @@ def computeResidualError(params, y, x):
 
     return residual_error / N
 
-
 def getModelCriterion(params, y, x, judge_func):
     sigma_2 = computeResidualError(params, y, x)
     score = judge_func(sigma_2, len(params), len(y))
     #print "Model score with order: %d is %f" % (len(params), score)
     return score
-
 
 if __name__ == "__main__":
     noise_sigma = 1
