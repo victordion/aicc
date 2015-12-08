@@ -1,19 +1,14 @@
 """
 Date: December 7 2015
 Author: Huanzhu Xu and Jianwei Cui
+Reference paper: Regression and Time Series Model Selection in Small Samples
 """
+
 import math
 import numpy as np
 from scipy import stats
 import statsmodels.api as sm
-
-""" model: a linear model
-Y: [N 1] sized data
-X: [N M] sized data
-Np: number of parameters of the model
-N: number of data points
-M: 
-"""
+import sys
 
 def computeAIC(residual_error, dim, N):
     return N * (math.log(residual_error) + 1) + 2 * (dim + 1)
@@ -81,25 +76,47 @@ def computeResidualError(params, y, x):
 
     return residual_error / N
 
-x, y = genData(1, [.5, 1, 2, 3], 8, 20)
 
 def getModelCriterion(params, y, x, judge_func):
     sigma_2 = computeResidualError(params, y, x)
     score = judge_func(sigma_2, len(params), len(y))
-    print "Model score with order: %d is %f" % (len(params), score)
+    #print "Model score with order: %d is %f" % (len(params), score)
     return score
 
-print y
-print x
 
-#result = reg_m(y, x[1:4, :])
-#print result.summary()
-#print result.params
+if __name__ == "__main__":
+    noise_sigma = 1
+    # in the order of beta0, beta1, beta2, ...
+    true_params = [0, 1, 2, 3]
+    gen_dim = 10
+    data_size = 10
+    
+    aic_scores = np.zeros(gen_dim)
+    aicc_scores = np.zeros(gen_dim)
+    for i in range(gen_dim):
+        aic_scores[i] = sys.float_info.max
+        aicc_scores[i] = sys.float_info.max
 
-for order in range(1, 7):
-    params = reg_m(y, x[1: order + 1, :]).params
-    getModelCriterion(params, y, x, computeAIC)
+    aic_win_times = np.zeros(gen_dim)
+    aicc_win_times = np.zeros(gen_dim)
+    
+    for experiment in range(1000):
+        x, y = genData(noise_sigma, true_params, gen_dim, data_size)
+        for order in range(1, gen_dim - 3):
+            params = reg_m(y, x[1: order + 1, :]).params
+            aic_scores[order] = getModelCriterion(params, y, x, computeAIC)
+            aicc_scores[order] = getModelCriterion(params, y, x, computeAICC)
+        
+        aic_win_order = np.argmin(aic_scores)
+        aicc_win_order = np.argmin(aicc_scores)
+        
+        aic_win_times[aic_win_order] += 1
+        aicc_win_times[aicc_win_order] += 1
 
+    print "AIC selection distribution"
+    print aic_win_times
+    print "AICC selection distribution"
+    print aicc_win_times
 
 
 
