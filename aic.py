@@ -50,7 +50,8 @@ def genData(sigma, params, out_dim, N):
     for j in range(N):
         for i in range(len(params)):
            y[j] += x[i][j] * params[i]
-        y[j] += np.random.normal(0, sigma)    
+        #y[j] += np.random.normal(0, sigma)    
+        y[j] += np.random.random_sample() * 5    
 
     return (x, y)
 
@@ -99,10 +100,10 @@ if __name__ == "__main__":
     
     for experiment in range(1000):
         x, y = genData(noise_sigma, true_params, gen_dim, data_size)
-        for order in range(1, gen_dim - 3):
-            params = reg_m(y, x[1: order + 1, :]).params
-            aic_scores[order] = getModelCriterion(params, y, x, computeAIC)
-            aicc_scores[order] = getModelCriterion(params, y, x, computeAICC)
+        for order in range(2, gen_dim - 3):
+            params = reg_m(y, x[1: order, :]).params
+            aic_scores[order - 1] = getModelCriterion(params, y, x, computeAIC)
+            aicc_scores[order - 1] = getModelCriterion(params, y, x, computeAICC)
         
         aic_win_order = np.argmin(aic_scores)
         aicc_win_order = np.argmin(aicc_scores)
@@ -125,7 +126,7 @@ if __name__ == "__main__":
     rects2 = plt.bar(index + bar_width, aicc_win_times, bar_width, color='r', label="AICC")
 
     plt.xlabel("Model Order")
-    plt.ylabel("Selected Times")
+    plt.ylabel("Frequency")
     plt.title("Model Criterion Performance")
     plt.xticks(index + bar_width, index)
     plt.legend()
